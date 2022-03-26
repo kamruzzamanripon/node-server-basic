@@ -2,6 +2,8 @@ const express = require('express');
 const router = require('./src/routes/api');
 const app = new express();
 const bodyParser = require('body-parser');
+const mongoose= require('mongoose');
+
 
 //Security Middleware Import
 const rateLimit= require('express-rate-limit')
@@ -10,7 +12,6 @@ const mongoSanitize=require('express-mongo-sanitize')
 const xss=require('xss-clean')
 const hpp=require('hpp')
 const cors=require('cors')
-const mongoose= require('mongoose');
 
 
 //Security Middleware Implement
@@ -19,7 +20,7 @@ app.use(helmet())
 app.use(mongoSanitize())
 app.use(xss())
 app.use(hpp())
-
+//request body read
 app.use(bodyParser.json());
 
 //Request Rate Limiting
@@ -28,6 +29,15 @@ const limiter = rateLimit({
     max: 100 // limit each IP to 100 requests per windowMs
 });
 app.use(limiter)
+
+//Mongo dB Connections
+let URI ="mongodb://127.0.0.1:27017/Schools";
+let OPTION = {user:'', pass:''};
+mongoose.connect(URI, OPTION, (error)=>{
+    console.log('Connection Success');
+    console.log(error);
+})
+
 
 
 app.use("/api/v1", router);
